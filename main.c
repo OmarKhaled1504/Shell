@@ -2,7 +2,6 @@
 #include<stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <wait.h>
 #include <string.h>
 
 char *input() {
@@ -65,15 +64,27 @@ char **parse(char *line, int *waitflag) {
     return tokens;
 }
 
+void handler() {
+    FILE *fp = fopen("/home/ketch/CLionProjects/Shell/log.txt", "a");
+    if (fp == NULL) {
+        printf("Error opening file!");
+        return;
+    }
+    fprintf(fp, "Child process was terminated\n");
+    fclose(fp);
+}
+
 void exec(char **args, int *waitflag) {
-    int pid = fork();
+    pid_t pid;
+    signal(SIGCHLD, handler);
+    pid = fork();
     if (pid == -1) {
         return;
     }
     if (pid == 0)
         execvp(args[0], args);
     else {
-        if (waitflag == 1)
+        if (*waitflag == 1)
             wait(NULL);
     }
 }
