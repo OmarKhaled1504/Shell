@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <wait.h>
 #include <string.h>
 
 char *input() {
@@ -34,7 +35,7 @@ char *input() {
     }
 }
 
-char **parse(char *line) {
+char **parse(char *line, int *waitflag) {
     int size = 64, pos = 0;
     char *delim = " \t\r\n\a"; //delimiters be any white space
     char **tokens = malloc(size * sizeof(char *));
@@ -56,22 +57,39 @@ char **parse(char *line) {
         }
         token = strtok(NULL, delim);
     }
+    if (strcmp(tokens[pos - 1], "&") == 0) {
+        *waitflag = 0;
+        tokens[pos - 1] = NULL; //add null in place of &
+    }
     tokens[pos] = NULL; //add null to the end of the string
     return tokens;
 }
 
-int main(int argc, char *argv[]) {
-    char *command = input();
-    char **args = parse(command);
+void exec(char **args, int *waitflag) {
     int pid = fork();
     if (pid == -1) {
-        return 1;
+        return;
     }
     if (pid == 0)
         execvp(args[0], args);
     else {
-        wait(NULL);
-        printf("success!");
+        if (waitflag == 1)
+            wait(NULL);
     }
+}
+
+void run() {
+    int *waitflag = 1;
+    while (1) {
+        char *command = input();
+        if (strcmp(command, "exit") != 0) {
+            char **args = parse(command, &waitflag);
+            exec(args, &waitflag);
+        } else break;
+    }
+}
+
+int main(int argc, char *argv[]) {
+    run();
     return 0;
 }
