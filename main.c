@@ -6,7 +6,6 @@
 
 char *input() {
     int size = 1024, pos = 0;
-
     char *buffer = malloc(sizeof(char) * size);
     int c;
     if (!buffer) {
