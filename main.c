@@ -81,11 +81,12 @@ void exec(char **args, int *waitflag) {
     if (pid == -1) {
         return;
     }
-    if (pid == 0)
-        execvp(args[0], args);
-    else {
+    if (pid == 0) {
+        if (execvp(args[0], args) == -1)
+            printf("Error occurred while executing command.\n");
+    } else {
         if (*waitflag == 1)
-            wait(NULL);
+            waitpid(pid, NULL, 0);
     }
 }
 
