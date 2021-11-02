@@ -58,7 +58,8 @@ char **parse(char *line, int *waitflag) {                   // parse input comma
     if (strcmp(tokens[pos - 1], "&") == 0) {                // check for "&" in the end and set wait flag accordingly
         *waitflag = 0;
         tokens[pos - 1] = NULL;                             // add null in place of &
-    }
+    } else
+        *waitflag = 1;                                      // resets waitflag for future commands
     tokens[pos] = NULL;                                     // add null to the end of the string
     return tokens;
 }
