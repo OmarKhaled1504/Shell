@@ -84,8 +84,10 @@ void exec(char **args, int *waitflag) {                     // creating a child 
     if (pid == 0) {
         if (strcmp(args[0], "cd") == 0) { chdir(args[1]); } // handling "cd" command
         else {
-            if (execvp(args[0], args) == -1)
+            if (execvp(args[0], args) == -1){
                 printf("Error occurred while executing command.\n");
+                exit(0);
+            }
         }
     } else {
         if (*waitflag ==
